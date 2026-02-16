@@ -55,15 +55,20 @@ curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
 curl_setopt($ch, CURLOPT_POST, true);
 curl_setopt($ch, CURLOPT_POSTFIELDS, json_encode($flaskPayload));
 curl_setopt($ch, CURLOPT_HTTPHEADER, ['Content-Type: application/json']);
-curl_setopt($ch, CURLOPT_TIMEOUT, 30);
+curl_setopt($ch, CURLOPT_TIMEOUT, 120);
 
 $response = curl_exec($ch);
 $httpCode = curl_getinfo($ch, CURLINFO_HTTP_CODE);
+$curlError = curl_error($ch); // GET THE TEXT ERROR
+$curlErrNo = curl_errno($ch); // GET THE ERROR NUMBER
 curl_close($ch);
 
 header('Content-Type: application/json');
 if ($httpCode >= 200 && $httpCode < 300 && $response) {
     echo $response;
 } else {
-    echo json_encode(['reply' => "Error connecting to AI (Code: $httpCode)"]);
+    //echo json_encode(['reply' => "Error connecting to AI (Code: $httpCode)"]);
+    echo json_encode([
+        'reply' => "Connection Error: ($curlErrNo) $curlError. HTTP Code: $httpCode"
+    ]);
 }
